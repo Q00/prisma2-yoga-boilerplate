@@ -1,0 +1,41 @@
+version: '3'
+services:
+  database:
+    image: bitnami/postgresql:11-debian-9
+    restart: on-failure
+    ports:
+      - '0.0.0.0:5432:5432'
+    environment:
+      - POSTGRESQL_PASSWORD=testpasswd
+      - POSTGRESQL_USERNAME=testuser
+      - POSTGRESQL_DATABASE=testdb
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=repuser
+      - POSTGRESQL_REPLICATION_PASSWORD=reppassword
+    volumes:
+      - ./db/conf.d # contains a custom postgresql.conf
+    networks:
+      coconet:
+        ipv4_address: 172.16.25.2
+  # server:
+  #   build:
+  #     context: .
+  #     dockerfile: ./dockerfile-dev
+  #   environment:
+  #     SENTRY_DSN: ''
+  #   ports:
+  #     - '3000:3000'
+  #   volumes:
+  #     - '.:/prisma-boilerplate/web'
+  #   depends_on:
+  #     - database
+  #   command: 'yarn dev'
+  #   networks:
+  #     coconet:
+  #       ipv4_address: 172.16.25.3
+networks:
+  coconet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.25.0/24
