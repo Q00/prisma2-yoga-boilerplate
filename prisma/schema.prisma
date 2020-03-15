@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Sex {
+  male female
+}
+
+enum Provider {
+  kakao
+}
+
+model User {
+  id          Int         @id @default(autoincrement())
+  nickname    String
+  birthdate   DateTime
+  sex         Sex
+  userPushId  String?
+  userAccount UserAccount
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?
+
+  @@unique([userPushId, userAccount])
+}
+
+model UserAccount {
+  id        Int       @id @default(autoincrement())
+  snsId     String    @unique
+  provider  Provider
+  user      User?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Nfc {
+  id        Int        @id @default(autoincrement())
+  value     String     @unique
+  userNfc   User_nfc[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  deletedAt DateTime?
+}
+
+model Routine {
+  id             Int              @id @default(autoincrement())
+  name           String
+  user           User
+  userNfcRoutine User_nfc_routine
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
+}
+
+model Alarm {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Result {
+  id              Int               @id @default(autoincrement())
+  date            DateTime
+  userNfcUser     User_nfc_routine
+  resultTimestamp Result_timestamp?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  deletedAt       DateTime?
+}
+
+model Result_timestamp {
+  id           Int       @id @default(autoincrement())
+  firstTagging DateTime
+  lastTagging  DateTime
+  result       Result
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+}
+
+model User_nfc {
+  id          Int               @id @default(autoincrement())
+  description String
+  user        User
+  nfc         Nfc
+  nfcRoutine  User_nfc_routine?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  deletedAt   DateTime?
+}
+
+model User_nfc_routine {
+  id        Int       @id @default(autoincrement())
+  daysArray String
+  fromTime  DateTime
+  endTime   DateTime
+  userNfc   User_nfc
+  result    Result[]
+  routine   Routine
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model User_nfc_alaram {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
